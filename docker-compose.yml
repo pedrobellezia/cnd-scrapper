@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    container_name: scrapper-api
+    ports:
+      - "5049:5049"
+    env_file:
+      - .env
+    restart: unless-stopped
+
