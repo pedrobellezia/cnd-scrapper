@@ -1,5 +1,5 @@
 from typing import Callable, Awaitable
-
+from selectolax.parser import HTMLParser
 from playwright.async_api import (
     Page,
     BrowserContext,
@@ -487,5 +487,65 @@ class Municipal:
         pdf_bytes = await response.body()
 
         logger.info("Municipal ES/Vitoria scrape completed for CNPJ: %s", cnpj)
+
+        return pdf_bytes
+
+    @staticmethod
+    async def rs_nova_prata(page: Page, _: BrowserContext, cnpj: str) -> bytes:
+        logger.info("Starting Municipal RS/Nova Prata scrape for CNPJ: %s", cnpj)
+
+        await page.goto(
+            "https://novaprata.multi24h.com.br/multi24/sistemas/portal/",
+            wait_until="domcontentloaded",
+            timeout=15000
+        )
+
+        consult_url = "https://novaprata.multi24h.com.br/multi24/sistemas/portal/multi24/portal/tributacao/emitir_certidoes_login/consultar"
+        consult_form_data = {
+            "emitir_certidoes[cpf]": "",
+            "emitir_certidoes[dtnasc]": "",
+            "emitir_certidoes[cnpj]": cnpj,
+            "emitir_certidoes[cadastro]": "",
+            "emitir_certidoes[numero_matricula]": "",
+            "emitir_certidoes[tipo_busca]": "cnpj"
+        }
+
+        search_response = await page.request.post(url=consult_url, form=consult_form_data)
+        parser = HTMLParser(await search_response.text())
+        row = parser.css_first("table#tbl_relacao_cadastros > tbody > tr:nth-of-type(2)")
+
+        if not row:
+            raise ScrapError(
+                message="Não foi possível emitir a CND",
+                cnpj=cnpj,
+                tipo_cnd="Municipal - RS/Nova Prata",
+                error_type=ErrorType.ScrapError,
+            )
+
+        data_id = row.attributes.get("data-id")
+
+        generate_cnd_url = "https://novaprata.multi24h.com.br/multi24/sistemas/portal/multi24/portal/tributacao/emitir_certidoes_login/gerar_negativa"
+        generate_form_data = {
+            "id": data_id,
+            "tipo": "1"
+        }
+
+        cnd_generation_response = await page.request.post(url=generate_cnd_url, form=generate_form_data)
+        cnd_data = await cnd_generation_response.json()
+        pdf_relative_path = cnd_data.get("filepath")
+
+        if not pdf_relative_path:
+            raise ScrapError(
+                message="Não foi possível emitir a CND",
+                cnpj=cnpj,
+                tipo_cnd="Municipal - RS/Nova Prata",
+                error_type=ErrorType.DownloadError,
+            )
+
+
+        pdf_response = await page.request.get(url=page.url + pdf_relative_path)
+        pdf_bytes = await pdf_response.body()
+
+        logger.info("Municipal RS/Nova Prata scrape completed for CNPJ: %s", cnpj)
 
         return pdf_bytes
