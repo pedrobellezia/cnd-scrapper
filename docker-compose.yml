@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: scrapper-api
+    container_name: cnd-scrapper
     ports:
       - "5049:5049"
     env_file:
