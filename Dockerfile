@@ -10,8 +10,6 @@ COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen --no-install-project
 
-RUN mkdir -p static/pdf static/error templates
-
 COPY app/ ./app/
 
 EXPOSE 5049

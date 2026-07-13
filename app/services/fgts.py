@@ -6,7 +6,7 @@ import asyncio
 
 class Fgts:
     @staticmethod
-    @handle_scrap_errors("fgtsqq")
+    @handle_scrap_errors("fgts")
     async def execute_scrap(*, page: Page, cnpj: str):
         logger.info("Starting FGTS scrape for CNPJ: %s", cnpj)
 
