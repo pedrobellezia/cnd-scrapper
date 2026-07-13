@@ -7,7 +7,7 @@ from playwright.async_api import (
     Download,
 )
 
-from app.exceptions import ScrapError, ErrorType
+from app.exceptions import ScrapError, ErrorType, handle_scrap_errors
 from app.core import logger, CAPTCHA_API_KEY
 from app.utils.captcha_solver import CaptchaSolver
 from pathlib import Path
@@ -19,10 +19,13 @@ from app.utils.pdf_handler import add_cnpj
 
 class Municipal:
     @staticmethod
+    @handle_scrap_errors("municipal")
     async def _execute_scrap(
         page: Page, context: BrowserContext, cnpj: str, uf: str, municipio: str
     ) -> bytes | None:
-        logger.info("Starting Municipal scrape for CNPJ: %s, %s/%s", cnpj, municipio, uf)
+        logger.info(
+            "Starting Municipal scrape for CNPJ: %s, %s/%s", cnpj, municipio, uf
+        )
 
         method_name = f"{uf}_{municipio}"
         # tipagem pro pycharm parar de reclamar
@@ -33,29 +36,7 @@ class Municipal:
         if not callable(method):
             return None
 
-        try:
-            return await method(page, context, cnpj)
-        except ScrapError as e:
-            e.tipo_cnd = f"Municipal - {municipio}/{uf.upper()}"
-            e.cnpj = cnpj
-            e.url = page.url
-            raise
-        except PlaywrightTimeout as e:
-            raise ScrapError(
-                message="Timeout durante Scrap da CND",
-                cnpj=cnpj,
-                tipo_cnd=f"Municipal - {municipio}/{uf.upper()}",
-                url=page.url,
-                error_type=ErrorType.TimeoutError,
-            ) from e
-        except Exception as e:
-            raise ScrapError(
-                message=f"Erro inesperado durante Scrap da CND: {str(e)}",
-                cnpj=cnpj,
-                tipo_cnd=f"Municipal - {municipio}/{uf.upper()}",
-                url=page.url,
-                error_type=ErrorType.ScrapError,
-            ) from e
+        return await method(page, context, cnpj)
 
     @staticmethod
     async def __solve_betha(
@@ -125,8 +106,6 @@ class Municipal:
         if not result.get("success", False):
             raise ScrapError(
                 message=result.get("error") or "Erro ao resolver CAPTCHA",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Blumenau",
                 error_type=ErrorType.CaptchaError,
             )
 
@@ -144,8 +123,6 @@ class Municipal:
         if not download_path:
             raise ScrapError(
                 message=f"Falha ao obter PDF para {cnpj}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Blumenau",
                 error_type=ErrorType.DownloadError,
             )
         pdf_bytes = Path(download_path).read_bytes()
@@ -165,8 +142,6 @@ class Municipal:
         if not download_path:
             raise ScrapError(
                 message=f"Falha ao obter PDF para {cnpj}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Florianopolis",
                 error_type=ErrorType.DownloadError,
             )
         pdf_bytes = Path(download_path).read_bytes()
@@ -176,7 +151,7 @@ class Municipal:
 
     @classmethod
     async def mg_para_de_minas(
-            cls, page: Page, context: BrowserContext, cnpj: str
+        cls, page: Page, context: BrowserContext, cnpj: str
     ) -> bytes:
         download_info = await cls.__solve_betha(
             page, context, cnpj, municipio_id="7267", estado_id="17"
@@ -186,8 +161,6 @@ class Municipal:
         if not download_path:
             raise ScrapError(
                 message=f"Falha ao obter PDF para {cnpj}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Florianopolis",
                 error_type=ErrorType.DownloadError,
             )
         pdf_bytes = Path(download_path).read_bytes()
@@ -205,8 +178,6 @@ class Municipal:
         if not download_path:
             raise ScrapError(
                 message=f"Falha ao obter PDF para {cnpj}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Lages",
                 error_type=ErrorType.DownloadError,
             )
         pdf_bytes = Path(download_path).read_bytes()
@@ -226,8 +197,6 @@ class Municipal:
         if not download_path:
             raise ScrapError(
                 message=f"Falha ao obter PDF para {cnpj}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Braco do Norte",
                 error_type=ErrorType.DownloadError,
             )
         pdf_bytes = Path(download_path).read_bytes()
@@ -245,8 +214,6 @@ class Municipal:
         if not download_path:
             raise ScrapError(
                 message=f"Falha ao obter PDF para {cnpj}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - SC/Criciuma",
                 error_type=ErrorType.DownloadError,
             )
         pdf_bytes = Path(download_path).read_bytes()
@@ -267,8 +234,12 @@ class Municipal:
         await asyncio.sleep(0.5)
         await page.locator("//a[@id='cnd']").click()
         await page.locator("//input[@name='nrcpfcnpj']").fill(cnpj)
-        await page.locator("//input[@name='nmrequerente']").fill("segredo")  # dado fictício, mas o campo é obrigatório
-        await page.locator("//input[@name='nrdocumento']").fill("52998224725")  # dado fictício, mas o campo é obrigatório
+        await page.locator("//input[@name='nmrequerente']").fill(
+            "segredo"
+        )  # dado fictício, mas o campo é obrigatório
+        await page.locator("//input[@name='nrdocumento']").fill(
+            "52998224725"
+        )  # dado fictício, mas o campo é obrigatório
 
         async with page.expect_popup() as popup_info:
             await page.locator("//input[@value='Emitir a Certidão']").click()
@@ -428,8 +399,12 @@ class Municipal:
         await asyncio.sleep(1)
         await page.locator("//a[@id='cnd']").click()
         await page.locator("//input[@name='nrcpfcnpj']").fill(cnpj)
-        await page.locator("//input[@name='nmrequerente']").fill("segredo")  # dado fictício, mas o campo é obrigatório
-        await page.locator("//input[@name='nrdocumento']").fill("52998224725")  # dado fictício, mas o campo é obrigatório
+        await page.locator("//input[@name='nmrequerente']").fill(
+            "segredo"
+        )  # dado fictício, mas o campo é obrigatório
+        await page.locator("//input[@name='nrdocumento']").fill(
+            "52998224725"
+        )  # dado fictício, mas o campo é obrigatório
 
         async with page.expect_popup() as popup_info:
             await page.locator("//input[@value='Emitir a Certidão']").click()
@@ -449,7 +424,7 @@ class Municipal:
         await page.goto(
             "https://tributario.vitoria.es.gov.br/Servicos/CertidaoNegativa/CertidaoNegativa.aspx",
             wait_until="domcontentloaded",
-            timeout=15000
+            timeout=15000,
         )
 
         await page.locator('//input[@value="CNPJ"]').click()
@@ -459,11 +434,11 @@ class Municipal:
         await page.locator("//input[@value='Continuar']").click()
 
         try:
-            await page.locator("//span[@id='ctl00_conteudo_lblMensagemExcluir']").wait_for(timeout=3000)
+            await page.locator(
+                "//span[@id='ctl00_conteudo_lblMensagemExcluir']"
+            ).wait_for(timeout=3000)
             raise ScrapError(
                 message="Não foi possível emitir a CND",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - ES/Vitoria",
                 error_type=ErrorType.ScrapError,
             )
         except PlaywrightTimeout:
@@ -479,8 +454,6 @@ class Municipal:
         if not response.ok:
             raise ScrapError(
                 message=f"Erro ao baixar CND: {response.status}",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - ES/Vitoria",
                 error_type=ErrorType.DownloadError,
             )
 
@@ -497,7 +470,7 @@ class Municipal:
         await page.goto(
             "https://novaprata.multi24h.com.br/multi24/sistemas/portal/",
             wait_until="domcontentloaded",
-            timeout=15000
+            timeout=15000,
         )
 
         consult_url = "https://novaprata.multi24h.com.br/multi24/sistemas/portal/multi24/portal/tributacao/emitir_certidoes_login/consultar"
@@ -507,41 +480,39 @@ class Municipal:
             "emitir_certidoes[cnpj]": cnpj,
             "emitir_certidoes[cadastro]": "",
             "emitir_certidoes[numero_matricula]": "",
-            "emitir_certidoes[tipo_busca]": "cnpj"
+            "emitir_certidoes[tipo_busca]": "cnpj",
         }
 
-        search_response = await page.request.post(url=consult_url, form=consult_form_data)
+        search_response = await page.request.post(
+            url=consult_url, form=consult_form_data
+        )
         parser = HTMLParser(await search_response.text())
-        row = parser.css_first("table#tbl_relacao_cadastros > tbody > tr:nth-of-type(2)")
+        row = parser.css_first(
+            "table#tbl_relacao_cadastros > tbody > tr:nth-of-type(2)"
+        )
 
         if not row:
             raise ScrapError(
                 message="Não foi possível emitir a CND",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - RS/Nova Prata",
                 error_type=ErrorType.ScrapError,
             )
 
         data_id = row.attributes.get("data-id")
 
         generate_cnd_url = "https://novaprata.multi24h.com.br/multi24/sistemas/portal/multi24/portal/tributacao/emitir_certidoes_login/gerar_negativa"
-        generate_form_data = {
-            "id": data_id,
-            "tipo": "1"
-        }
+        generate_form_data = {"id": data_id, "tipo": "1"}
 
-        cnd_generation_response = await page.request.post(url=generate_cnd_url, form=generate_form_data)
+        cnd_generation_response = await page.request.post(
+            url=generate_cnd_url, form=generate_form_data
+        )
         cnd_data = await cnd_generation_response.json()
         pdf_relative_path = cnd_data.get("filepath")
 
         if not pdf_relative_path:
             raise ScrapError(
                 message="Não foi possível emitir a CND",
-                cnpj=cnpj,
-                tipo_cnd="Municipal - RS/Nova Prata",
                 error_type=ErrorType.DownloadError,
             )
-
 
         pdf_response = await page.request.get(url=page.url + pdf_relative_path)
         pdf_bytes = await pdf_response.body()

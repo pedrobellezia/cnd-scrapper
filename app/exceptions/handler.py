@@ -26,7 +26,7 @@ async def request_validation_handler(_: Request, exc: RequestValidationError):
 
 async def scrap_error_handler(_: Request, exc: ScrapError):
     payload = ErrorResponse(
-        error=exc.error_type.value if hasattr(exc.error_type, "value") else str(exc.error_type),
+        error=exc.error_type.value,
         message=exc.message,
         details=ErrorDetails(
             cnpj=exc.cnpj,
@@ -36,11 +36,11 @@ async def scrap_error_handler(_: Request, exc: ScrapError):
         ),
     )
     logger.error(
-        "Scrap error on %s for CNPJ %s: %s", 
-        exc.tipo_cnd, 
-        exc.cnpj, 
-        exc.message, 
-        exc_info=exc
+        "Scrap error on %s for CNPJ %s: %s",
+        exc.tipo_cnd,
+        exc.cnpj,
+        exc.message,
+        exc_info=exc,
     )
     return JSONResponse(status_code=exc.status_code, content=payload.model_dump())
 

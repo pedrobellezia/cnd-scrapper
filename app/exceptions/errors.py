@@ -27,6 +27,16 @@ class AppBaseError(Exception):
         self.cnpj = cnpj
         self.tipo_cnd = tipo_cnd
         self.error_type = error_type or ErrorType.ScrapError
+
+        status_mapping = {
+            ErrorType.ElementNotFound: 502,  # Bad Gateway
+            ErrorType.TimeoutError: 504,  # Gateway Timeout
+            ErrorType.DownloadError: 502,  # Bad Gateway
+            ErrorType.CaptchaError: 502,  # Bad Gateway
+            ErrorType.CndUnavailable: 503,  # Service Unavailable
+            ErrorType.ScrapError: 500,  # Internal Server Error
+        }
+        self.status_code = status_mapping.get(self.error_type, 500)
         super().__init__(self.message)
 
 

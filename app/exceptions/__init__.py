@@ -1,4 +1,5 @@
 from .errors import ScrapError, ErrorType
+from .decorators import handle_scrap_errors
 from .handler import (
     request_validation_handler,
     scrap_error_handler,
@@ -9,6 +10,7 @@ from .handler import (
 __all__ = [
     "ScrapError",
     "ErrorType",
+    "handle_scrap_errors",
     "request_validation_handler",
     "scrap_error_handler",
     "http_exception_handler",

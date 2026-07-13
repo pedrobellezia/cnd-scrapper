@@ -1,10 +1,10 @@
 from playwright.async_api import (
     Page,
     BrowserContext,
-    TimeoutError as PlaywrightTimeout,
     Download,
+    TimeoutError as PlaywrightTimeout,
 )
-from app.exceptions import ScrapError, ErrorType
+from app.exceptions import ScrapError, ErrorType, handle_scrap_errors
 from app.core import logger, CAPTCHA_API_KEY
 from app.utils.captcha_solver import CaptchaSolver
 from pathlib import Path
@@ -17,6 +17,7 @@ from app.utils.pdf_handler import add_cnpj
 
 class Estadual:
     @staticmethod
+    @handle_scrap_errors("estadual")
     async def execute_scrap(
         page: Page, context: BrowserContext, cnpj: str, uf: str
     ) -> bytes | None:
@@ -24,29 +25,7 @@ class Estadual:
         method: Callable[..., Awaitable[bytes]] | None = getattr(Estadual, uf, None)
         if not callable(method) or uf.startswith("_"):
             return None
-        try:
-            return await method(page=page, context=context, cnpj=cnpj)
-        except ScrapError as e:
-            e.tipo_cnd = f"Estadual - {uf.upper()}"
-            e.cnpj = cnpj
-            e.url = page.url
-            raise
-        except PlaywrightTimeout as e:
-            raise ScrapError(
-                message="Timeout durante Scrap da CND",
-                cnpj=cnpj,
-                tipo_cnd=f"Estadual - {uf.upper()}",
-                url=page.url,
-                error_type=ErrorType.TimeoutError,
-            ) from e
-        except Exception as e:
-            raise ScrapError(
-                message=f"Erro inesperado durante Scrap da CND: {str(e)}",
-                cnpj=cnpj,
-                tipo_cnd=f"Estadual - {uf.upper()}",
-                url=page.url,
-                error_type=ErrorType.ScrapError,
-            ) from e
+        return await method(page=page, context=context, cnpj=cnpj)
 
     @staticmethod
     async def sp(*, page: Page, context: BrowserContext, cnpj: str) -> bytes:
@@ -245,31 +224,27 @@ class Estadual:
             "https://s2-internet.sefaz.es.gov.br/certidao/cnd", timeout=90000
         )
 
-        await page.locator(
-            "//li[@title='Certidão Negativa de Débito']/a"
-        ).click()
+        await page.locator("//li[@title='Certidão Negativa de Débito']/a").click()
 
-        await page.locator(
-            "//input[@name='numIdentificacao']"
-        ).fill(cnpj)
+        await page.locator("//input[@name='numIdentificacao']").fill(cnpj)
 
-
-        sitekey = await page.locator("//div[@class='cf-turnstile']").get_attribute('data-sitekey')
+        sitekey = await page.locator("//div[@class='cf-turnstile']").get_attribute(
+            "data-sitekey"
+        )
 
         solver = CaptchaSolver(api_key=CAPTCHA_API_KEY, page=page).solver
         result = await solver.turnstile(sitekey=sitekey, url=page.url)
-        code = result['code']
+        code = result["code"]
         await page.evaluate(f"""
                             document.querySelector('[name="cf-turnstile-response"]').value = '{code}';
                             """)
 
-
-        await page.locator(
-            "//button[@id='btn-emitir-certidao']"
-        ).click()
+        await page.locator("//button[@id='btn-emitir-certidao']").click()
 
         # Não está conseguindo puxar o atributo do pdf
-        b64pdf = await page.locator("//div[@id='divCertidao']/object").get_attribute("data", timeout=90000)
+        b64pdf = await page.locator("//div[@id='divCertidao']/object").get_attribute(
+            "data", timeout=90000
+        )
 
         base64_data = b64pdf.split(",", 1)[1]
 
@@ -278,4 +253,3 @@ class Estadual:
         logger.info("Estadual ES scrape completed for CNPJ: %s", cnpj)
 
         return pdf_bytes
-
