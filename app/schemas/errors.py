@@ -13,6 +13,9 @@ class ErrorDetails(BaseModel):
     cnd_type: str | None = None
     url: str | None = None
     status_code: int | None = None
+    screenshot: str | None = None
+    uf: str | None = None
+    municipio: str | None = None
 
 
 class ErrorResponse(BaseModel):
