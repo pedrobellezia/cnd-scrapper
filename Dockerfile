@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.60.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.60.0-noble
 
 RUN apt-get update && apt-get install -y xvfb && rm -rf /var/lib/apt/lists/*
 
