@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.60.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.60.0-noble
 
 RUN apt-get update && apt-get install -y xvfb && rm -rf /var/lib/apt/lists/*
 
@@ -9,8 +9,6 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen --no-install-project
-
-RUN mkdir -p static/pdf static/error templates
 
 COPY app/ ./app/
 

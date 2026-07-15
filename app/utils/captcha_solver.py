@@ -63,7 +63,7 @@ class CaptchaSolver:
         try:
             result = await self.solver.recaptcha(sitekey=sitekey, url=self.page.url)
             token = result["code"]
-        except Exception as e:
+        except Exception:
             logger.exception("[CaptchaSolver] Erro ao resolver CAPTCHA")
             return {"success": False, "error": "Falha ao resolver CAPTCHA"}
 
@@ -116,8 +116,10 @@ class CaptchaSolver:
             result = await self.solver.normal(img_b64, caseSensitive=1)
             code = result["code"]
 
-            logger.debug("[CaptchaSolver] Codigo recebido do provedor (%s...)", code[:4])
-        except Exception as e:
+            logger.debug(
+                "[CaptchaSolver] Codigo recebido do provedor (%s...)", code[:4]
+            )
+        except Exception:
             logger.exception("[CaptchaSolver] Falha ao resolver CAPTCHA")
             return {"success": False, "error": "Erro ao resolver CAPTCHA"}
 

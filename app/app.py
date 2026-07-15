@@ -3,6 +3,8 @@ from __future__ import annotations
 from playwright.async_api import async_playwright, Playwright
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from app.core.config import SCREENSHOTS_DIR
+from starlette.staticfiles import StaticFiles
 import app.core.dependencies as deps
 from app.core import (
     HEADLESS,
@@ -41,6 +43,8 @@ app = FastAPI(lifespan=lifespan)
 add_routes(app=app)
 add_middlewares(app=app)
 add_exceptions(app=app)
+
+app.mount("/screenshot", StaticFiles(directory=str(SCREENSHOTS_DIR)), name="screenshot")
 
 if __name__ == "__main__":
     import uvicorn

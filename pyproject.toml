@@ -13,6 +13,7 @@ dependencies = [
     "pypdf>=6.12.2",
     "reportlab>=4.5.1",
     "rich>=15.0.0",
+    "selectolax>=0.4.10",
     "unidecode>=1.4.0",
     "uvicorn>=0.48.0",
 ]

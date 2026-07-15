@@ -1,5 +1,6 @@
 from os import getenv
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Carregar variaveis de ambiente
 load_dotenv()
@@ -18,6 +19,8 @@ HEADLESS = get_env("HEADLESS", required=True).lower() == "true"
 MAX_CONCURRENT_BROWSERS = int(get_env("MAX_CONCURRENT_BROWSERS", required=True))
 API_KEY = get_env("API_KEY", required=True)
 ALLOWED_ORIGINS = get_env("ALLOWED_ORIGINS", required=True).split(",")
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+SCREENSHOTS_DIR = BASE_DIR / "screenshots"
 
 # Configurações do Playwright
 PLAYWRIGHT_ARGS = [
@@ -34,4 +37,5 @@ __all__ = [
     "MAX_CONCURRENT_BROWSERS",
     "API_KEY",
     "ALLOWED_ORIGINS",
+    "SCREENSHOTS_DIR",
 ]
