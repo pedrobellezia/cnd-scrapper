@@ -1,0 +1,74 @@
+name: "Bug"
+description: "Reporte um problema encontrado no projeto."
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: checkboxes
+    id: confirmacoes
+    attributes:
+      label: Confirmações
+      description: Confirme os itens abaixo antes de prosseguir.
+      options:
+        - label: Verifiquei que ainda não existe uma issue para este problema.
+          required: true
+        - label: Completei o título com uma descrição curta do bug, com até 50 caracteres.
+          required: true
+
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição"
+      description: "Descreva claramente o problema encontrado."
+    validations:
+      required: true
+
+  - type: textarea
+    id: passos
+    attributes:
+      label: "Reprodução"
+      description: "Descreva os passos necessários para reproduzir o problema."
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamento_esperado
+    attributes:
+      label: "Esperado"
+      description: "Descreva o que deveria acontecer."
+
+  - type: dropdown
+    id: sistema_operacional
+    attributes:
+      label: "Sistema Operacional"
+      options:
+        - Linux
+        - Windows
+        - macOS
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ambiente
+    attributes:
+      label: "Ambiente"
+      description: "Informe onde o projeto estava sendo executado."
+      options:
+        - Docker
+        - Local
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs"
+      description: "Cole logs, mensagens de erro ou stack traces relevantes."
+      render: shell
+
+  - type: textarea
+    id: observacoes
+    attributes:
+      label: "Observações"
