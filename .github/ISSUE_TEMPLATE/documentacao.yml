@@ -1,0 +1,31 @@
+name: "Documentação"
+description: "Solicite alterações ou adições à documentação."
+title: "[Doc]: "
+labels: ["doc"]
+body:
+  - type: checkboxes
+    id: confirmacoes
+    attributes:
+      label: Confirmações
+      description: Confirme os itens abaixo antes de prosseguir.
+      options:
+        - label: Verifiquei que essa informação ainda não foi corrigida ou detalhada na documentação atual.
+          required: true
+        - label: Completei o título com uma descrição curta do assunto da issue, com até 50 caracteres.
+          required: true
+
+  - type: textarea
+    id: what_md
+    attributes:
+      label: "Link"
+      description: "Insira o link do arquivo .md que deve ser modificado."
+    validations:
+      required: true
+
+  - type: textarea
+    id: whats_lackin
+    attributes:
+      label: "Descrição"
+      description: "Descreva a alteração ou adição necessária."
+    validations:
+      required: true

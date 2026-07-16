@@ -73,7 +73,8 @@ def handle_scrap_errors(tipo_cnd: str):
                         filename = f"error_{int(time.time())}.png"
                         screenshot_path = SCREENSHOTS_DIR / filename
 
-                        await page.screenshot(path=str(screenshot_path))
+                        await page.bring_to_front()
+                        await page.screenshot(path=str(screenshot_path), timeout=1000)
                         logger.info("Screenshot de erro salva em: %s", screenshot_path)
                         active_error.screenshot = filename
                     except Exception as e:

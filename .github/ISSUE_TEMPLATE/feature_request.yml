@@ -1,0 +1,39 @@
+name: "Sugestao de Feature"
+description: "Sugira uma nova feature ou melhoria para o projeto."
+title: "[Feature]: "
+labels: ["feature"]
+body:
+  - type: checkboxes
+    id: confirmacoes
+    attributes:
+      label: Confirmações
+      description: Confirme os itens abaixo antes de prosseguir.
+      options:
+        - label: Verifiquei que ainda não existe uma issue sugerindo esta funcionalidade.
+          required: true
+        - label: Completei o título com uma descrição curta do assunto da issue, com até 50 caracteres.
+          required: true
+
+  - type: textarea
+    id: what_feature
+    attributes:
+      label: "Feature"
+      description: "Forneça uma explicação clara e detalhada sobre a feature desejada."
+    validations:
+      required: true
+
+  - type: textarea
+    id: how_feature
+    attributes:
+      label: "Exemplo"
+      description: "Explique como a feature seria utilizada."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivacao
+    attributes:
+      label: "Motivação"
+      description: "Explique a motivação para implementar essa funcionalidade."      
+    validations:
+      required: true
