@@ -1,0 +1,117 @@
+name: "Solicitação de CND Municipal"
+description: "Pedir suporte para uma certidão municipal que ainda não está mapeada no sistema."
+title: "[Nova CND Municipal]: [Nome do Município - UF]"
+labels: ["cnd-municipal", "feature"]
+
+body:
+  - type: checkboxes
+    id: confirmacoes
+    attributes:
+      label: Confirmações
+      description: Confirme os itens abaixo antes de prosseguir.
+      options:
+        - label: Substituí "[Nome do Município - UF]" no título da issue pelo município e UF desejados.
+          required: true
+        - label: Verifiquei que ainda não existe uma issue para esta CND.
+          required: true
+        - label: Entendo que informações incorretas ou incompletas podem resultar no fechamento da issue.
+          required: true
+
+  - type: dropdown
+    id: uf
+    attributes:
+      label: "UF"
+      description: "Selecione o estado onde se localiza o município."
+      options:
+        - AC
+        - AL
+        - AM
+        - AP
+        - BA
+        - CE
+        - DF
+        - ES
+        - GO
+        - MA
+        - MG
+        - MS
+        - MT
+        - PA
+        - PB
+        - PE
+        - PI
+        - PR
+        - RJ
+        - RN
+        - RO
+        - RR
+        - RS
+        - SC
+        - SE
+        - SP
+        - TO
+    validations:
+      required: true
+
+  - type: input
+    id: municipio
+    attributes:
+      label: "Município"
+      description: "Informe o nome completo do município."
+      placeholder: "Ex: Campinas"
+    validations:
+      required: true
+
+  - type: input
+    id: link_cnd
+    attributes:
+      label: "Link"
+      description: "URL direta para página de emissão da CND."
+      placeholder: "https://www.prefeitura.sp.gov.br/cnd"
+    validations:
+      required: true
+
+  - type: input
+    id: cnpj_teste
+    attributes:
+      label: "CNPJ"
+      description: "Insira um CNPJ válido para testes no desenvolvimento."
+      placeholder: "00.000.000/0001-00"
+    validations:
+      required: true
+
+  - type: textarea
+    id: parametros_adicionais
+    attributes:
+      label: "Parâmetros"
+      description: "Caso o portal exija dados adicionais, informe quais são necessários para emitir a CND."
+      placeholder: "Ex: Inscrição Municipal: 123456"
+
+  - type: dropdown
+    id: captcha_tipo
+    attributes:
+      label: "CAPTCHA"
+      description: "Identifique se a página possui CAPTCHA."
+      options:
+        - "Não possui"
+        - "reCAPTCHA"
+        - "hCaptcha"
+        - "Cloudflare Turnstile"
+        - "CAPTCHA por imagem"
+        - "Outro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: exemplo_documento
+    attributes:
+      label: "Exemplo"
+      description: "Anexe um PDF ou uma imagem de uma certidão emitida por esse portal. Lembre-se de ocultar os dados sensíveis antes do envio"
+      placeholder: "Arraste o arquivo aqui..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: observacoes
+    attributes:
+      label: "Observações"
