@@ -28,6 +28,9 @@ PLAYWRIGHT_ARGS = [
     "--disable-blink-features=AutomationControlled",
     "--no-sandbox",
     "--disable-infobars",
+    "--disable-renderer-backgrounding",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding"
 ]
 
 __all__ = [
