@@ -5,6 +5,8 @@ from .config import (
     API_KEY,
     ALLOWED_ORIGINS,
     CAPTCHA_API_KEY,
+    HOST,
+    PORT,
 )
 from .logging import logger, setup_logging
 from .security import auth_key
@@ -28,4 +30,6 @@ __all__ = [
     "add_exceptions",
     "add_middlewares",
     "add_routes",
+    "HOST",
+    "PORT",
 ]

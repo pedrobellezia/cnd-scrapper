@@ -19,6 +19,8 @@ HEADLESS = get_env("HEADLESS", required=True).lower() == "true"
 MAX_CONCURRENT_BROWSERS = int(get_env("MAX_CONCURRENT_BROWSERS", required=True))
 API_KEY = get_env("API_KEY", required=True)
 ALLOWED_ORIGINS = get_env("ALLOWED_ORIGINS", required=True).split(",")
+HOST = get_env("HOST", required=True)
+PORT = int(get_env("PORT", required=True))
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SCREENSHOTS_DIR = BASE_DIR / "screenshots"
 
@@ -41,4 +43,6 @@ __all__ = [
     "API_KEY",
     "ALLOWED_ORIGINS",
     "SCREENSHOTS_DIR",
+    "HOST",
+    "PORT",
 ]

@@ -17,4 +17,4 @@ EXPOSE 5049
 ENV PATH="/app/.venv/bin:$PATH"
 
 CMD xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
-    uvicorn app.app:app --host 0.0.0.0 --port 5049
+    sh -c 'uvicorn app.app:app --host "$HOST" --port "$PORT"'
