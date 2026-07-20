@@ -33,7 +33,7 @@ PLAYWRIGHT_ARGS = [
     "--disable-infobars",
     "--disable-renderer-backgrounding",
     "--disable-backgrounding-occluded-windows",
-    "--disable-renderer-backgrounding",
+    "--disable-renderer-backgrounding"
 ]
 
 __all__ = [
