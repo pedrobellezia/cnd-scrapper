@@ -10,7 +10,7 @@ from .config import (
 )
 from .logging import logger, setup_logging
 from .security import auth_key
-from .dependencies import get_browser, get_tools
+from .dependencies import get_tools
 from .middleware import add_process_time_header
 from .server_configs import add_middlewares, add_routes, add_exceptions
 
@@ -21,7 +21,6 @@ __all__ = [
     "logger",
     "API_KEY",
     "auth_key",
-    "get_browser",
     "setup_logging",
     "get_tools",
     "ALLOWED_ORIGINS",

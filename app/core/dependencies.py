@@ -35,12 +35,3 @@ async def get_tools() -> AsyncGenerator[tuple[Page, BrowserContext], Any]:
             if context:
                 await context.close()
 
-
-def get_browser() -> Browser:
-    """Retorna a instância global do browser."""
-    global browser
-    if browser is None:
-        raise RuntimeError(
-            "Browser nao inicializado. Verifique o lifespan da aplicacao."
-        )
-    return browser
