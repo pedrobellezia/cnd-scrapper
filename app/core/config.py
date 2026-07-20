@@ -21,6 +21,7 @@ API_KEY = get_env("API_KEY", required=True)
 ALLOWED_ORIGINS = get_env("ALLOWED_ORIGINS", required=True).split(",")
 HOST = get_env("HOST", required=True)
 PORT = int(get_env("PORT", required=True))
+PAGE_TIMEOUT = int(get_env("PAGE_TIMEOUT", required=True))
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SCREENSHOTS_DIR = BASE_DIR / "screenshots"
 
@@ -32,7 +33,7 @@ PLAYWRIGHT_ARGS = [
     "--disable-infobars",
     "--disable-renderer-backgrounding",
     "--disable-backgrounding-occluded-windows",
-    "--disable-renderer-backgrounding"
+    "--disable-renderer-backgrounding",
 ]
 
 __all__ = [
@@ -45,4 +46,5 @@ __all__ = [
     "SCREENSHOTS_DIR",
     "HOST",
     "PORT",
+    "PAGE_TIMEOUT",
 ]

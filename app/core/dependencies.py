@@ -2,7 +2,7 @@ from typing import Any, AsyncGenerator
 from playwright.async_api import Browser, Page, BrowserContext
 import asyncio
 from playwright_stealth import Stealth
-from .config import MAX_CONCURRENT_BROWSERS
+from .config import MAX_CONCURRENT_BROWSERS, PAGE_TIMEOUT
 
 # Estado global do Playwright
 browser: Browser | None = None
@@ -26,6 +26,7 @@ async def get_tools() -> AsyncGenerator[tuple[Page, BrowserContext], Any]:
 
             await stealth.apply_stealth_async(page)
             await stealth.apply_stealth_async(context)
+            page.set_default_timeout(timeout=PAGE_TIMEOUT)
 
             yield page, context
         finally:
