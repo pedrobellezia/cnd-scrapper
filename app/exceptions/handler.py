@@ -4,16 +4,14 @@ from fastapi.responses import JSONResponse
 
 from app.core import logger
 from .errors import ScrapError
-from app.schemas import ErrorDetails, ErrorResponse, ValidationErrorItem
+from app.schemas import ErrorDetails, ErrorResponse
 
 
 async def request_validation_handler(_: Request, exc: RequestValidationError):
-    formatted_errors = []
+    formatted_errors = {}
     for err in exc.errors():
         field = ".".join(str(part) for part in err["loc"] if part != "body")
-        formatted_errors.append(
-            ValidationErrorItem(field=field or "body", message=err["msg"])
-        )
+        formatted_errors[field or "body"] = err["msg"]
 
     payload = ErrorResponse(
         error="RequestValidationError",
@@ -37,6 +35,7 @@ async def scrap_error_handler(_: Request, exc: ScrapError):
             municipio=exc.municipio,
         ),
     )
+
     logger.error(
         "Scrap error on %s for CNPJ %s: %s",
         exc.tipo_cnd,

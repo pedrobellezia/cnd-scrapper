@@ -1,5 +1,5 @@
 from .requests import EstadualRequest, BaseCndRequest, MunicipalRequest
-from .errors import ErrorResponse, ErrorDetails, ValidationErrorItem
+from .errors import ErrorResponse, ErrorDetails
 
 __all__ = [
     "BaseCndRequest",
@@ -7,5 +7,4 @@ __all__ = [
     "MunicipalRequest",
     "ErrorResponse",
     "ErrorDetails",
-    "ValidationErrorItem",
 ]
