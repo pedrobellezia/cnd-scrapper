@@ -438,8 +438,8 @@ class Municipal:
                 "//span[@id='ctl00_conteudo_lblMensagemExcluir']"
             ).wait_for(timeout=3000)
             raise ScrapError(
-                message="Não foi possível emitir a CND",
-                error_type=ErrorType.ScrapError,
+                message="Não foi possível emitir a certidão porque constam débitos pendentes.",
+                error_type=ErrorType.CndUnavailable,
             )
         except PlaywrightTimeout:
             pass

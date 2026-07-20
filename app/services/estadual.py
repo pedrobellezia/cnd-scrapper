@@ -53,7 +53,7 @@ class Estadual:
 
         if await page.locator("//*[@class='bg-danger']").is_visible():
             raise ScrapError(
-                message="Nao foi possivel obter uma certidão válida",
+                message="Não foi possível emitir a certidão porque constam débitos pendentes.",
                 error_type=ErrorType.CndUnavailable,
             )
 

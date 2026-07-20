@@ -3,11 +3,6 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 
 
-class ValidationErrorItem(BaseModel):
-    field: str
-    message: str
-
-
 class ErrorDetails(BaseModel):
     cnpj: str | None = None
     cnd_type: str | None = None
@@ -23,4 +18,4 @@ class ErrorResponse(BaseModel):
 
     error: str
     message: str
-    details: ErrorDetails | list[ValidationErrorItem] | None = None
+    details: ErrorDetails | dict[str, str] | None = None

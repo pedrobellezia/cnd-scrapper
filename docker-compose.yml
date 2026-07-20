@@ -3,7 +3,7 @@ services:
     build: .
     container_name: cnd-scrapper
     ports:
-      - "5049:5049"
+      - "${PORT}:${PORT}"
     env_file:
       - .env
     restart: unless-stopped

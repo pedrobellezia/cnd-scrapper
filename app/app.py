@@ -13,6 +13,8 @@ from app.core import (
     add_routes,
     add_middlewares,
     add_exceptions,
+    HOST,
+    PORT,
 )
 
 setup_logging()
@@ -49,4 +51,4 @@ app.mount("/screenshot", StaticFiles(directory=str(SCREENSHOTS_DIR)), name="scre
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app.app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.app:app", host=HOST, port=PORT, reload=True)
