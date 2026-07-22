@@ -8,7 +8,7 @@ Este guia descreve os passos necessários para expandir e manter os scrapers de 
 1. [Adicionando uma Nova CND](#adicionando-uma-nova-cnd)
 2. [Adicionando uma Nova CND Estadual](#adicionando-uma-nova-cnd-estadual)
 3. [Adicionando uma Nova CND Municipal](#adicionando-uma-nova-cnd-municipal)
-4. [Como levantar exceções (Raise)](#como-levantar-exceções-raise)
+4. [Exceptions](#exceptions)
 5. [Como resolver CAPTCHAs](#como-resolver-captchas)
 
 ---
@@ -16,7 +16,7 @@ Este guia descreve os passos necessários para expandir e manter os scrapers de 
 ## Adicionando uma Nova CND
 
 ### 1. Crie o Service
-Crie um arquivo na pasta `app/services/` (ex: `app/services/federal.py`). A classe do serviço deve implementar a lógica de scraping utilizando o Playwright:
+Crie um arquivo na pasta `app/services/` (ex: `app/services/federal.py`):
 
 ```python
 from playwright.async_api import Page
@@ -51,13 +51,32 @@ __all__ = ["Estadual", "Municipal", "Trabalhista", "Fgts", "Federal"]
 ---
 
 ### 2. Crie o Schema (Opcional)
-Se você precisar enviar parâmetros adicionais na requisição além do CNPJ, crie um schema específico herdando de `BaseCndRequest`. Caso contrário, você pode ignorar este passo e usar o `BaseCndRequest` diretamente no Router.
+Se você precisar enviar parâmetros adicionais na requisição além do CNPJ, adicione um schema específico no arquivo `app/schemas/requests.py` herdando de `BaseCndRequest`. Caso contrário, você pode ignorar este passo e usar o `BaseCndRequest` diretamente no Router.
 
+No arquivo requests.py:
 ```python
-from app.schemas import BaseCndRequest
+import re
+from unidecode import unidecode
+from pydantic import BaseModel, ConfigDict, StrictStr, field_validator
+
+# ...
+
+class BaseCndRequest(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+    )
+
+    cnpj: StrictStr
+
+    @field_validator("cnpj")
+    @classmethod
+    def validate_cnpj(cls, v: str) -> str:
+        return normalize_cnpj(v)
 
 class FederalCndRequest(BaseCndRequest):
     inscricao_estadual: str
+
 ```
 
 No arquivo `app/schemas/__init__.py`, exponha o novo schema:
@@ -101,11 +120,10 @@ async def federal(
 ```
 
 > [!NOTE]
-> - A responsabilidade deste arquivo é exclusivamente: tratamento HTTP e validação dos dados recebidos. 
+> - A responsabilidade deste arquivo é, exclusivamente, tratamento HTTP e validação dos dados recebidos. 
 > - **`page`**: Utilizada para interagir diretamente e navegar pelas páginas do portal.
 > - **`context`**: Utilizada para gerenciar cookies, local sessions e afins, portanto não é obrigatório.
 
-#### Adicione no `__init__.py` do Router:
 No arquivo `app/router/__init__.py`, exponha o novo router:
 ```python
 from .estadual import router as estadual_router
@@ -165,7 +183,7 @@ async def rj(*, page: Page, context: BrowserContext, cnpj: str) -> bytes:
 
 ## Adicionando uma Nova CND Municipal
 
-Assim como no caso estadual, a lógica municipal é dinâmica. O roteador municipal despacha as requisições para métodos com nomenclatura padronizada.
+Assim como no caso estadual, as CNDs municipais já possuem router e uma classe configurada.
 
 Para adicionar um município (ex: Itajaí - SC):
 1. Abra o arquivo `app/services/municipal.py`.
@@ -188,7 +206,7 @@ async def sc_itajai(page: Page, context: BrowserContext, cnpj: str) -> bytes:
 
 ### Integração com Betha Sistemas
 
-Se o portal da CND municipal utilizar a plataforma **Betha Sistemas** (como no caso de Florianópolis - SC), o procedimento é diferente e exige um `@classmethod`:
+Se o portal da CND municipal utilizar a plataforma **Betha Sistemas** (como no caso de Autazes - AM), o procedimento é diferente e exige um `@classmethod`:
 
 1. Utilize o DevTools do seu navegador para inspecionar a página [Betha CDWeb](https://e-gov.betha.com.br/cdweb).
 2. Identifique o id do estado no elemento de xpath `//select[@id="mainForm:estados"]`.
@@ -197,11 +215,11 @@ Se o portal da CND municipal utilizar a plataforma **Betha Sistemas** (como no c
 
 ```python
 @classmethod
-async def sc_florianopolis(
+async def am_autazes(
     cls, page: Page, context: BrowserContext, cnpj: str
 ) -> bytes:
     download_info = await cls.__solve_betha(
-        page, context, cnpj, municipio_id="94", estado_id="22"
+        page, context, cnpj, municipio_id="6616", estado_id="3"
     )
 
     download_path = await download_info.path()
@@ -212,23 +230,23 @@ async def sc_florianopolis(
         )
     pdf_bytes = Path(download_path).read_bytes()
 
-    logger.info("Municipal SC/Florianopolis scrape completed for CNPJ: %s", cnpj)
+    logger.info("Municipal AM/Autazes scrape completed for CNPJ: %s", cnpj)
     return pdf_bytes
 ```
 ---
 
-## Como levantar exceções (Raise)
+## Exceptions
 
 Para manter a consistência nas respostas da API e no fluxo de logging, utilize sempre a exceção personalizada `ScrapError` (importada de `app.exceptions`).
 
-Você deve informar o `error_type` apropriado (que define o status HTTP retornado pelo servidor). Os tipos mapeados em `ErrorType` são:
+Você deve informar o `error_type` apropriado. Os tipos são:
 
 * `CaptchaError` (Retorna HTTP 502): Use quando houver falhas ao resolver CAPTCHAs.
 * `ElementNotFound` (Retorna HTTP 502): Use quando elementos esperados na página não puderam ser localizados.
 * `TimeoutError` (Retorna HTTP 504): Levantado automaticamente se operações do Playwright estourarem o tempo limite.
 * `DownloadError` (Retorna HTTP 502): Erro no download do PDF do documento emitido.
 * `ScrapError` (Retorna HTTP 500): Falha interna genérica.
-* `CndUnavailable` (Retorna HTTP 422): Use quando a consulta foi bem sucedida, mas o órgão informa que o CNPJ **possui débitos** pendentes e por isso a CND não pôde ser emitida.
+* `CndUnavailable` (Retorna HTTP 422): Use quando a consulta foi bem sucedida, mas o órgão não emite o documento devido à débitos pendentes da empresa.
  
 ### Exemplo prático:
 ```python
@@ -255,7 +273,7 @@ from app.utils.captcha_solver import CaptchaSolver
 solver = CaptchaSolver(api_key=CAPTCHA_API_KEY, page=page)
 ```
 
-### 1. reCAPTCHA v2 (comum na maioria dos portais)
+### 1. reCAPTCHA v2
 O método `auto_solve_v2` localiza automaticamente o iframe do reCAPTCHA v2 na página, obtém o `sitekey`, solicita a resolução e insere a resposta na área correta:
 ```python
 result = await solver.auto_solve_v2()

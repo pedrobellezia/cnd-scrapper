@@ -72,10 +72,10 @@ Campos configuráveis no `.env`:
 | `CAPTCHA_API_KEY`         | Chave de API do [2captcha](https://2captcha.com/).                         | `sua_chave_aqui`                             |
 | `HEADLESS`                | Define se o navegador deve rodar em modo headless (sem interface gráfica). | `False`                                      |
 | `MAX_CONCURRENT_BROWSERS` | Número máximo de instâncias de navegadores simultâneas.                    | `3`                                          |
-| `API_KEY`                 | Token estático utilizado para proteger os endpoints da API (Bearer Auth).  | `meu_token_secreto`                          |
-| `ALLOWED_ORIGINS`         | Origens CORS permitidas (separadas por vírgula).                           | `http://localhost:3000`                      |
+| `API_KEY`                 | Token utilizado para proteger os endpoints da API.                         | `meu_token_secreto`                          |
+| `ALLOWED_ORIGINS`         | Origens permitidas pelo CORS (separadas por vírgula).                      | `http://localhost:3000`                      |
 | `HOST`                    | IP ou host onde a aplicação escutará.                                      | `0.0.0.0`                                    |
-| `PORT`                    | Porta na qual a API será exposta.                                          | `5049`                                       |
+| `PORT`                    | Porta à ser exposta pela API.                                              | `5049`                                       |
 
 > [!NOTE]
 > Todas as rotas são testadas utilizando `HEADLESS=False`. A execução com `HEADLESS=True` pode falhar em algumas certidões devido a mecanismos de detecção de bots.
@@ -116,8 +116,6 @@ Campos configuráveis no `.env`:
    docker compose up --build -d
    ```
 
-A API estará disponível por padrão no endereço: `http://localhost:5049/docs`
-
 ---
 
 ## Como Usar a API
@@ -135,7 +133,10 @@ A API estará disponível por padrão no endereço: `http://localhost:5049/docs`
 ### 3. Endpoints Disponíveis
 
 > [!NOTE]
-> Todos os endpoints de consulta de CND listados abaixo retornam diretamente o arquivo **PDF** da certidão gerada (`Content-Type: application/pdf`) em caso de sucesso.
+> Todos os parâmetros solicitados nas rotas são sanitizados pela própria aplicação.
+> - "12.345.678/0001-90" => "12345678000190"
+> - "São Paulo" => "sao_paulo"
+> - "SP" => "sp"
 
 #### FGTS
 
@@ -205,10 +206,6 @@ A API estará disponível por padrão no endereço: `http://localhost:5049/docs`
   }
   ```
 * **Retorno:** Arquivo PDF (`application/pdf`)
-  > Todos os parâmetros solicitados nas rotas são sanitizados pela própria aplicação.
-  > - "12.345.678/0001-90" => "12345678000190"
-  > - "São Paulo" => "sao_paulo"
-  > - "SP" => "sp"
 
 ##### Exemplo de Uso (curl):
 ```bash

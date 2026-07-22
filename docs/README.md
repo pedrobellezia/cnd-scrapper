@@ -28,7 +28,7 @@ sequenceDiagram
     end
 
     Service->>Portal: Solicita emissão do documento
-    Portal-->>Service: Baixa PDF
+    Portal-->>Service: Retorna a Cnd em PDF
 
     Service-->>Router: Retorna PDF em bytes 
     Router-->>Cliente: application/pdf
@@ -42,6 +42,8 @@ Dessa forma, quando um erro é levantado durante a execução, temos o seguinte 
 1. Captura o estado atual da página e salva a imagem em `/screenshot/{nome}.png`.
 2. Extrai e compila as informações disponíveis da requisição para estruturar um erro `ScrapError` padronizado e propaga esse erro.
 
+> [!WARNING]
+> A captura de tela (screenshot) pode falhar ou não ser gerada caso ocorra um timeout durante o carregamento da página.
 ---
 
 ### Estrutura de Pastas e Componentes
@@ -52,5 +54,5 @@ A estrutura interna do projeto foi desenhada para manter a lógica de scraping d
 * `app/router/`: Centraliza a lógica HTTP e a validação de entrada das requisições.
 * `app/schemas/`: Define modelos de dados, serialização e validação das requisições e respostas da API.
 * `app/services/`: Centraliza a lógica de negócios e automação dos fluxos de scraping.
-* `app/utils/`: Contém funções auxiliares e utilitários reutilizáveis (como resolução de Captcha e PDF).
+* `app/utils/`: Contém funções auxiliares.
 * `app/exceptions/`: Define erros personalizados e manipuladores globais (handlers) de falhas.
