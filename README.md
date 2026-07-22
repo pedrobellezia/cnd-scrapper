@@ -79,6 +79,7 @@ Campos configuráveis no `.env`:
 
 > [!NOTE]
 > Todas as rotas são testadas utilizando `HEADLESS=False`. A execução com `HEADLESS=True` pode falhar em algumas certidões devido a mecanismos de detecção de bots.
+>
 > É recomendado gerar a chave `API_KEY` utilizando a biblioteca `secrets`:
 > ```bash
 > python -c "import secrets; print(secrets.token_hex(32))"
