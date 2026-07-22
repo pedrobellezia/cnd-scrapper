@@ -67,15 +67,15 @@ cp .env.example .env
 
 Campos configuráveis no `.env`:
 
-| Variável                  | Descrição                                                                  | Exemplo                                       |
-|:--------------------------|:---------------------------------------------------------------------------|:----------------------------------------------|
-| `CAPTCHA_API_KEY`         | Chave de API do [2captcha](https://2captcha.com/).                         | `sua_chave_aqui`                              |
-| `HEADLESS`                | Define se o navegador deve rodar em modo headless (sem interface gráfica). | `False`                                       |
-| `MAX_CONCURRENT_BROWSERS` | Número máximo de instâncias de navegadores simultâneas.                    | `3`                                           |
-| `API_KEY`                 | Token estático utilizado para proteger os endpoints da API (Bearer Auth).  | `meu_token_secreto`                           |
-| `ALLOWED_ORIGINS`         | Origens CORS permitidas (separadas por vírgula).                           | `http://localhost:3000,http://127.0.0.1:3000` |
-| `HOST`                    | IP ou host onde a aplicação escutará.                                      | `0.0.0.0`                                     |
-| `PORT`                    | Porta na qual a API será exposta.                                          | `5049`                                        |
+| Variável                  | Descrição                                                                  | Exemplo                                      |
+|:--------------------------|:---------------------------------------------------------------------------|:---------------------------------------------|
+| `CAPTCHA_API_KEY`         | Chave de API do [2captcha](https://2captcha.com/).                         | `sua_chave_aqui`                             |
+| `HEADLESS`                | Define se o navegador deve rodar em modo headless (sem interface gráfica). | `False`                                      |
+| `MAX_CONCURRENT_BROWSERS` | Número máximo de instâncias de navegadores simultâneas.                    | `3`                                          |
+| `API_KEY`                 | Token estático utilizado para proteger os endpoints da API (Bearer Auth).  | `meu_token_secreto`                          |
+| `ALLOWED_ORIGINS`         | Origens CORS permitidas (separadas por vírgula).                           | `http://localhost:3000`                      |
+| `HOST`                    | IP ou host onde a aplicação escutará.                                      | `0.0.0.0`                                    |
+| `PORT`                    | Porta na qual a API será exposta.                                          | `5049`                                       |
 
 > [!NOTE]
 > Todas as rotas são testadas utilizando `HEADLESS=False`. A execução com `HEADLESS=True` pode falhar em algumas certidões devido a mecanismos de detecção de bots.
