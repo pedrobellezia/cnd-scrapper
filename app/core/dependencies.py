@@ -34,4 +34,3 @@ async def get_tools() -> AsyncGenerator[tuple[Page, BrowserContext], Any]:
                 await page.close()
             if context:
                 await context.close()
-

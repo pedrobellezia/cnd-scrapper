@@ -6,6 +6,7 @@ from rich.traceback import install as install_traceback
 import fastapi
 import starlette
 import playwright
+
 install_traceback()
 
 
@@ -13,9 +14,7 @@ class RichHandlerWrapper(RichHandler):
     def __init__(self, **kwargs):
         console = Console(width=160)
         # Suprime traceback do fastapi, starlette e playwright
-        kwargs.setdefault(
-            "tracebacks_suppress", [fastapi, starlette, playwright]
-        )
+        kwargs.setdefault("tracebacks_suppress", [fastapi, starlette, playwright])
         super().__init__(console=console, **kwargs)
 
 
@@ -48,4 +47,3 @@ def setup_logging():
 
 
 logger = logging.getLogger("app")
-
