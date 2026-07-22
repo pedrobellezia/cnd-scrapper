@@ -80,7 +80,7 @@ Campos configuráveis no `.env`:
 
 > Todas as rotas são testadas utilizando `HEADLESS=False`. A execução com `HEADLESS=True` pode falhar em algumas certidões devido a mecanismos de detecção de bots.
 
-> é recomendado gerar a chave `API_KEY` utilizando a biblioteca `secrets`:
+> É recomendado gerar a chave `API_KEY` utilizando a biblioteca `secrets`:
 > ```bash
 > python -c "import secrets; print(secrets.token_hex(32))"
 > ```
@@ -161,7 +161,7 @@ A API estará disponível por padrão no endereço: `http://localhost:5049/docs`
 * **Headers:**
   - `Content-Type: application/json`
   - `Authorization: Bearer <API_KEY>`
-* **body:**
+* **Body:**
   ```json
   {
     "cnpj": "12.345.678/0001-90"
@@ -178,7 +178,7 @@ A API estará disponível por padrão no endereço: `http://localhost:5049/docs`
 * **Headers:**
   - `Content-Type: application/json`
   - `Authorization: Bearer <API_KEY>`
-* **body:**
+* **Body:**
   ```json
   {
     "cnpj": "12.345.678/0001-90",
@@ -196,7 +196,7 @@ A API estará disponível por padrão no endereço: `http://localhost:5049/docs`
 * **Headers:**
   - `Content-Type: application/json`
   - `Authorization: Bearer <API_KEY>`
-* **body:**
+* **Body:**
   ```json
   {
     "cnpj": "12.345.678/0001-90",
@@ -234,7 +234,7 @@ curl -X POST http://localhost:5049/fgts \
 
 
 
-### Erros de Scraping
+#### Erros de Scraping
 Erros que ocorrem durante um scraping.
 ```json
 {
@@ -265,3 +265,11 @@ Para ajudar na depuração de eventuais erros, o scraper captura uma imagem da p
 ```
 http://{HOST}:{PORT}/screenshot/{nome_do_arquivo_de_erro}.png
 ```
+
+---
+
+## Desenvolvimento e Arquitetura
+
+* **[Estrutura e Arquitetura Geral](docs/README.md)**
+* **[Guia Prático de Desenvolvimento](docs/DESENVOLVIMENTO.md)**
+
